@@ -1,9 +1,11 @@
-import 'package:demo_dhcp_windows/screens/dashBoardScreen.dart';
+import 'package:demo_dhcp_windows/screens/dashBoard.dart';
+import 'package:demo_dhcp_windows/screens/homeScreen.dart';
 import 'package:demo_dhcp_windows/screens/doraFlowScreen.dart';
 import 'package:demo_dhcp_windows/screens/leaseListScreen.dart';
 import 'package:demo_dhcp_windows/screens/scopeInfoScreen.dart';
 import 'package:go_router/go_router.dart';
 
+const dashBoard = '/dash_board';
 const doraFlow = '/dora_flow';
 const leaseList = '/lease_list';
 const scopeInfo = '/scope_info';
@@ -12,10 +14,16 @@ final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(
-      path:'/',
+      path: '/',
+      name: 'home-screen',
+      builder: (context, state) => HomeScreen()
+    ),
+
+      GoRoute(
+      path: dashBoard,
       name: 'dash-board',
       builder: (context, state) => DashBoardScreen()
-    ),
+      ),
 
     GoRoute(
       path: doraFlow,

@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DashBoardScreen extends StatelessWidget {
+  final String activeScope = "192.168.1.0/24";
+  final String gateway = "192.168.1.1";
+  final int connectedClient = 12;
+  final int maximumCapacity = 100;
+
   const DashBoardScreen({super.key});
 
   @override
@@ -31,9 +36,9 @@ class DashBoardScreen extends StatelessWidget {
                 Text(
                   "Server Status",
                   style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500
+                    fontSize: 16.sp,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500
                   ),
                 ),
               ],
@@ -43,8 +48,8 @@ class DashBoardScreen extends StatelessWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      color: Color(0xff16a249)
+                    borderRadius: BorderRadius.circular(30),
+                    color: Color(0xff16a249)
                   ),
                   height: 20.h,
                   width: 20.w,
@@ -55,9 +60,9 @@ class DashBoardScreen extends StatelessWidget {
                 Text(
                   "DHCP Server Online",
                   style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500
+                    fontSize: 16.sp,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500
                   ),
                 )
               ],
@@ -68,15 +73,15 @@ class DashBoardScreen extends StatelessWidget {
             Row(
               children: [
                 Text(
-                    "Active Scope: ",
-                    style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Color(0xff757c8a),
-                        fontWeight: FontWeight.w500
-                    )
+                  "Active Scope: ",
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: Color(0xff757c8a),
+                    fontWeight: FontWeight.w500
+                  )
                 ),
                 Text(
-                  "192.168.1.0/24",
+                  activeScope,
                   style: TextStyle(
                       fontSize: 12.sp,
                       color: Colors.black,
@@ -93,22 +98,21 @@ class DashBoardScreen extends StatelessWidget {
                 Text(
                   "Gateway: ",
                   style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Color(0xff757c8a),
-                      fontWeight: FontWeight.w500
+                    fontSize: 12.sp,
+                    color: Color(0xff757c8a),
+                    fontWeight: FontWeight.w500
                   ),
                 ),
                 Text(
-                  "192.168.1.1",
+                  gateway,
                   style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600
+                    fontSize: 12.sp,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600
                   ),
                 )
               ],
             )
-
           ],
         ),
       ),
@@ -143,7 +147,7 @@ class DashBoardScreen extends StatelessWidget {
               SizedBox(height: 16.0.h),
 
               Text(
-                "12",
+                "$connectedClient",
                 style: TextStyle(
                     fontSize: 20.sp,
                     color: Color(0xff1f74f7),
@@ -154,9 +158,9 @@ class DashBoardScreen extends StatelessWidget {
               Text(
                 "Active Leases",
                 style: TextStyle(
-                    fontSize: 12.sp,
-                    color: Color(0xff757c8a),
-                    fontWeight: FontWeight.w600
+                  fontSize: 12.sp,
+                  color: Color(0xff757c8a),
+                  fontWeight: FontWeight.w600
                 ),
               ),
               SizedBox(height: 8.0.h),
@@ -168,7 +172,7 @@ class DashBoardScreen extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 8.0.h),
                   child: Text(
-                    "12/100 IPs Used",
+                    "$connectedClient/$maximumCapacity IPs Used",
                     style: TextStyle(
                         fontSize: 12.sp,
                         color: Colors.black,

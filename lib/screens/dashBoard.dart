@@ -11,14 +11,14 @@ class DashBoardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        serverStatusSection(),
-        SizedBox(height: 12.0.h),
-        connectedClientsSection(),
-        SizedBox(height: 12.0.h),
-        bottomNavigationTab()
-      ],
+    return Expanded(
+      child: Column(
+        children: [
+          serverStatusSection(),
+          SizedBox(height: 12.0.h),
+          Expanded(child: connectedClientsSection()),
+        ],
+      ),
     );
   }
 
@@ -146,38 +146,47 @@ class DashBoardScreen extends StatelessWidget {
 
               SizedBox(height: 16.0.h),
 
-              Text(
-                "$connectedClient",
-                style: TextStyle(
-                    fontSize: 20.sp,
-                    color: Color(0xff1f74f7),
-                    fontWeight: FontWeight.w900
-                ),
-              ),
-              SizedBox(height: 8.0.h),
-              Text(
-                "Active Leases",
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: Color(0xff757c8a),
-                  fontWeight: FontWeight.w600
-                ),
-              ),
-              SizedBox(height: 8.0.h),
-              Card(
-                color: Color(0xfff6f6f8),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusGeometry.circular(15)
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 8.0.h),
-                  child: Text(
-                    "$connectedClient/$maximumCapacity IPs Used",
-                    style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600
-                    ),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "$connectedClient",
+                        style: TextStyle(
+                            fontSize: 20.sp,
+                            color: Color(0xff1f74f7),
+                            fontWeight: FontWeight.w900
+                        ),
+                      ),
+                      SizedBox(height: 8.0.h),
+                      Text(
+                        "Active Leases",
+                        style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Color(0xff757c8a),
+                            fontWeight: FontWeight.w600
+                        ),
+                      ),
+                      SizedBox(height: 8.0.h),
+                      Card(
+                        color: Color(0xfff6f6f8),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(15)
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 8.0.h),
+                          child: Text(
+                            "$connectedClient/$maximumCapacity IPs Used",
+                            style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
                 ),
               )

@@ -23,14 +23,11 @@ class _DoraFlowScreenState extends State<DoraFlowScreen> {
       setState(() {
         isActiveList[i] = true;
       });
-      await Future.delayed(Duration(seconds: 2));
-      setState(() {
-        isActiveList[i] = false;
-      });
+      await Future.delayed(Duration(seconds: 1));
     }
 
     if (isActiveList.every((active) => active)) {
-      await Future.delayed(Duration(seconds: 0));
+      await Future.delayed(Duration(seconds: 1));
       setState(() {
         isActiveList = List.generate(itemCount, (_) => false);
       });

@@ -1,9 +1,14 @@
+import 'package:demo_dhcp_windows/apiServices/apiServices.dart';
+import 'package:demo_dhcp_windows/models/dashBoard.dart';
+import 'package:demo_dhcp_windows/models/lease.dart';
+import 'package:demo_dhcp_windows/models/scopeInfo.dart';
 import 'package:demo_dhcp_windows/screens/dashBoard.dart';
 import 'package:demo_dhcp_windows/screens/doraFlowScreen.dart';
 import 'package:demo_dhcp_windows/screens/leaseListScreen.dart';
 import 'package:demo_dhcp_windows/screens/scopeInfoScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +19,74 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  late Future<DashBoard> _dashBoardFuture;
+  late Future<ScopeInfo> _scopeInfoFuture;
+  late Future<List<Lease>> _leaseListFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize futures with ApiService from Provider
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    _dashBoardFuture = fetchDashBoardData(apiService);
+    _scopeInfoFuture = fetchScopeInfo(apiService);
+    _leaseListFuture = fetchLeaseList(apiService);
+  }
+
+  Future<DashBoard> fetchDashBoardData(ApiService apiService) async {
+    try {
+      final data = await apiService.fetchDashBoard();
+      print(data);
+      return data;
+    } catch (e) {
+      print('Error with fetching dashboard data: $e');
+      rethrow;
+    }
+  }
+
+  Future<ScopeInfo> fetchScopeInfo(ApiService apiService) async {
+    try {
+      final data = await apiService.fetchScopeInfo();
+      print(data);
+      return data;
+    } catch (e) {
+      print('Error with fetching scope info: $e');
+      rethrow;
+    }
+  }
+
+  Future<List<Lease>> fetchLeaseList(ApiService apiService) async {
+    try {
+      final data = await apiService.fetchLeases();
+      print(data);
+      return data;
+    } catch (e) {
+      print('Error with fetching lease list: $e');
+      rethrow;
+    }
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  Widget contentSection() {
+    if (_selectedIndex == 0) {
+      return DashBoardScreen(dashBoardData: _dashBoardFuture);
+    } else if (_selectedIndex == 1) {
+      return DoraFlowScreen();
+    } else if (_selectedIndex == 2) {
+      return LeaseListScreen(leaseData: _leaseListFuture);
+    } else {
+      // Pass both scopeInfoData and dashBoardData to handle activeLeases
+      return ScopeInfoScreen(
+        scopeInfoData: _scopeInfoFuture,
+        dashBoardData: _dashBoardFuture,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,17 +111,42 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 16.sp,
                   color: Color(0xff757c8a),
-                  fontWeight: FontWeight.w400
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              SizedBox(height: 16.0.h),
+              Container(
+                color: Color(0xffffffff),
+                child: InkWell(
+                  child: Column(
+                    children: [
+                      Icon(Icons.refresh),
+                      Text(
+                        "Refresh",
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      )
+                    ],
+                  ),
+                  onTap: () {
+                    setState(() {
+                      final apiService = Provider.of<ApiService>(context, listen: false);
+                      _dashBoardFuture = fetchDashBoardData(apiService);
+                      _scopeInfoFuture = fetchScopeInfo(apiService);
+                      _leaseListFuture = fetchLeaseList(apiService);
+                    });
+                  },
                 ),
               ),
               SizedBox(height: 16.0.h),
               navigationTab(
-                titles: [
-                  'Dashboard', 'Dora Flow', 'Lease List', 'Scope Info'
-                ]
+                titles: ['Dashboard', 'Dora Flow', 'Lease List', 'Scope Info'],
               ),
               SizedBox(height: 8.0.h),
-              contentSection(),
+              Expanded(child: contentSection()),
             ],
           ),
         ),
@@ -56,45 +154,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget contentSection() {
-    if (_selectedIndex == 0) {
-      return DashBoardScreen();
-    }
-    else if (_selectedIndex == 1) {
-      return DoraFlowScreen();
-    }
-
-    else if (_selectedIndex == 2) {
-      return LeaseListScreen();
-    }
-
-    else {
-      return ScopeInfoScreen();
-    }
-  }
-
   Widget navigationTab({required List<String> titles}) {
-    int middleOfList = (titles.length/2).toInt();
+    int middleOfList = (titles.length / 2).toInt();
     return Column(
       children: [
         navigationRow(
           titles: titles.sublist(0, middleOfList),
-          selectedIndex: _selectedIndex,
+          selectedIndex: _selectedIndex < middleOfList ? _selectedIndex : -1,
           onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
+            _onItemTapped(index);
           },
         ),
         SizedBox(height: 8.h),
         navigationRow(
-            titles: titles.sublist(middleOfList, titles.length),
-            selectedIndex: _selectedIndex - middleOfList,
-            onTap: (index) {
-              setState(() {
-                _selectedIndex = index + middleOfList;
-              });
-            }
+          titles: titles.sublist(middleOfList, titles.length),
+          selectedIndex:
+          _selectedIndex >= middleOfList ? _selectedIndex - middleOfList : -1,
+          onTap: (index) {
+            _onItemTapped(index + middleOfList);
+          },
         ),
       ],
     );
@@ -143,4 +221,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-

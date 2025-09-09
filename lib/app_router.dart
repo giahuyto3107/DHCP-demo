@@ -1,8 +1,4 @@
-import 'package:demo_dhcp_windows/screens/dashBoard.dart';
 import 'package:demo_dhcp_windows/screens/homeScreen.dart';
-import 'package:demo_dhcp_windows/screens/doraFlowScreen.dart';
-import 'package:demo_dhcp_windows/screens/leaseListScreen.dart';
-import 'package:demo_dhcp_windows/screens/scopeInfoScreen.dart';
 import 'package:go_router/go_router.dart';
 
 const dashBoard = '/dash_board';
@@ -19,28 +15,28 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => HomeScreen()
     ),
 
-      GoRoute(
-      path: dashBoard,
-      name: 'dash-board',
-      builder: (context, state) => DashBoardScreen()
-      ),
-
-    GoRoute(
-      path: doraFlow,
-      name: 'dora-flow',
-      builder: (context, state) => DoraFlowScreen()
-    ),
-
-    GoRoute(
-      path: leaseList,
-      name: 'lease-list',
-      builder: (context, state) => LeaseListScreen()
-    ),
-
-    GoRoute(
-      path: scopeInfo,
-      name: 'scope-info',
-      builder: (context, state) => ScopeInfoScreen()
-    ),
+    // GoRoute(
+    // path: dashBoard,
+    // name: 'dash-board',
+    // builder: (context, state) => DashBoardScreen()
+    // ),
+    //
+    // GoRoute(
+    //   path: doraFlow,
+    //   name: 'dora-flow',
+    //   builder: (context, state) => DoraFlowScreen()
+    // ),
+    //
+    // GoRoute(
+    //   path: leaseList,
+    //   name: 'lease-list',
+    //   builder: (context, state) => LeaseListScreen()
+    // ),
+    //
+    // GoRoute(
+    //   path: scopeInfo,
+    //   name: 'scope-info',
+    //   builder: (context, state) => ScopeInfoScreen()
+    // ),
   ]
 );

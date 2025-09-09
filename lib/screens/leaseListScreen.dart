@@ -1,40 +1,19 @@
-import 'package:demo_dhcp_windows/models/connectedDeviceDetail.dart';
+import 'package:demo_dhcp_windows/models/lease.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class LeaseListScreen extends StatelessWidget {
-  final List<ConnectedDeviceDetail> connectedDeviceDetails = [];
-  ConnectedDeviceDetail device1 = ConnectedDeviceDetail(
-    deviceType: "Laptop",
-    host: "laptop-john",
-    ip: "192.168.1.101",
-    mac: "AA:BB:CC:DD:EE:01"
-  );
-  ConnectedDeviceDetail device2 = ConnectedDeviceDetail(
-      deviceType: "tv",
-      host: "laptop-john",
-      ip: "192.168.1.101",
-      mac: "AA:BB:CC:DD:EE:01"
-  );
-  ConnectedDeviceDetail device3 = ConnectedDeviceDetail(
-      deviceType: "mobile",
-      host: "laptop-john",
-      ip: "192.168.1.101",
-      mac: "AA:BB:CC:DD:EE:01"
-  );
-  LeaseListScreen({super.key});
-
-  void addConnectedDeviceDetail(ConnectedDeviceDetail connectedDeviceDetail) {
-    connectedDeviceDetails.add(connectedDeviceDetail);
-  }
+class LeaseListScreen extends StatefulWidget {
+  final Future<List<Lease>> leaseData;
+  const LeaseListScreen({super.key, required this.leaseData});
 
   @override
+  State<LeaseListScreen> createState() => _LeaseListScreenState();
+}
+
+class _LeaseListScreenState extends State<LeaseListScreen> {
+  @override
   Widget build(BuildContext context) {
-    addConnectedDeviceDetail(device1);
-    addConnectedDeviceDetail(device2);
-    addConnectedDeviceDetail(device3);
-    addConnectedDeviceDetail(device1);
-    addConnectedDeviceDetail(device2);
+
     return Expanded(
       child: Card(
         child: Padding(
@@ -58,10 +37,25 @@ class LeaseListScreen extends StatelessWidget {
               SizedBox(height: 8.0.h),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Column(
-                    children: List.generate(connectedDeviceDetails.length, (index) {
-                    return deviceDetailCard(connectedDeviceDetails[index]);
-                  }).toList(),
+                  child: FutureBuilder(
+                    future: widget.leaseData,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (snapshot.hasData) {
+                        // Use snapshot.data instead of dashBoardData
+                        final leaseData = snapshot.data!;
+                        return Column(
+                          children: List.generate(leaseData.length, (index) {
+                            return deviceDetailCard(leaseData: leaseData[index]);
+                          }).toList(),
+                        );
+                      } else {
+                        return Center(child: Text("No data"));
+                      }
+                    }
                   ),
                 ),
               )
@@ -73,7 +67,7 @@ class LeaseListScreen extends StatelessWidget {
     );
   }
 
-  Widget deviceDetailCard(ConnectedDeviceDetail connectedDeviceDetail) {
+  Widget deviceDetailCard({required Lease leaseData}) {
     return Card(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 12.0.h, horizontal: 12.0.w),
@@ -82,16 +76,19 @@ class LeaseListScreen extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  connectedDeviceDetail.deviceType == "laptop"
+                  getHostDevice(hostName: leaseData.hostName ?? 'Unknown') == "laptop"
                     ? Icons.laptop
-                    : connectedDeviceDetail.deviceType == "mobile"
+                    : getHostDevice(hostName: leaseData.hostName ?? 'Unknown')  == "mobile"
                       ? Icons.phone_android
-                      : connectedDeviceDetail.deviceType == "tv"
-                        ? Icons.tv : Icons.device_unknown
+                      : getHostDevice(hostName: leaseData.hostName ?? 'Unknown')  == "tv"
+                        ? Icons.tv
+                        : getHostDevice(hostName: leaseData.hostName ?? 'Unknown') == "pc"
+                          ? Icons.important_devices
+                          : Icons.device_unknown
                 ),
                 SizedBox(width: 6.w),
                 Text(
-                  connectedDeviceDetail.ip,
+                  leaseData.ipAddress,
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.black,
@@ -112,7 +109,7 @@ class LeaseListScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  connectedDeviceDetail.mac,
+                  leaseData.macAddress,
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: Color(0xff757c8a),
@@ -133,7 +130,7 @@ class LeaseListScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  connectedDeviceDetail.host,
+                  leaseData.hostName ?? "Unknown",
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: Color(0xff757c8a),
@@ -146,5 +143,20 @@ class LeaseListScreen extends StatelessWidget {
         ),
       )
     );
+  }
+
+  String getHostDevice({required String hostName}) {
+    hostName = hostName.toLowerCase();
+    if (hostName.contains('tv')) {
+      return "tv";
+    } else if (hostName.contains('laptop')) {
+      return "laptop";
+    } else if (hostName.contains('mobile')) {
+      return "mobile";
+    } else if (hostName.contains("pc")) {
+      return "pc";
+    } else {
+      return "Unknown";
+    }
   }
 }

@@ -1,28 +1,44 @@
+import 'package:demo_dhcp_windows/models/dashBoard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class DashBoardScreen extends StatelessWidget {
-  final String activeScope = "192.168.1.0/24";
-  final String gateway = "192.168.1.1";
-  final int connectedClient = 12;
-  final int maximumCapacity = 100;
+class DashBoardScreen extends StatefulWidget {
+  final Future<DashBoard> dashBoardData;
+  const DashBoardScreen({super.key, required this.dashBoardData});
 
-  const DashBoardScreen({super.key});
+  @override
+  State<DashBoardScreen> createState() => _DashBoardScreenState();
+}
 
+class _DashBoardScreenState extends State<DashBoardScreen> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Column(
-        children: [
-          serverStatusSection(),
-          SizedBox(height: 12.0.h),
-          Expanded(child: connectedClientsSection()),
-        ],
+      child: FutureBuilder(
+        future: widget.dashBoardData,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.hasData) {
+            // Use snapshot.data instead of dashBoardData
+            final dashBoardData = snapshot.data!;
+            return Column(
+              children: [
+                serverStatusSection(dashBoardData: dashBoardData), // Pass data if needed
+                SizedBox(height: 12.0.h),
+                Expanded(child: connectedClientsSection(dashBoardData: dashBoardData)), // Pass data if needed
+              ],
+            );
+          }
+          return Center(child: Text('No data'));
+        }
       ),
     );
   }
 
-  Widget serverStatusSection() {
+  Widget serverStatusSection({required DashBoard dashBoardData}) {
     return Card(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 16.0.h),
@@ -49,7 +65,9 @@ class DashBoardScreen extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
-                    color: Color(0xff16a249)
+                    color: dashBoardData.serverStatus.toLowerCase() == "offline"
+                      ? Colors.red
+                      : Color(0xff16a249)
                   ),
                   height: 20.h,
                   width: 20.w,
@@ -58,7 +76,7 @@ class DashBoardScreen extends StatelessWidget {
                 SizedBox(width: 8.w),
 
                 Text(
-                  "DHCP Server Online",
+                  "DHCP Server ${dashBoardData.serverStatus}",
                   style: TextStyle(
                     fontSize: 16.sp,
                     color: Colors.black,
@@ -81,7 +99,7 @@ class DashBoardScreen extends StatelessWidget {
                   )
                 ),
                 Text(
-                  activeScope,
+                  dashBoardData.activeScope,
                   style: TextStyle(
                       fontSize: 12.sp,
                       color: Colors.black,
@@ -104,7 +122,7 @@ class DashBoardScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  gateway,
+                  dashBoardData.gateway,
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: Colors.black,
@@ -119,7 +137,7 @@ class DashBoardScreen extends StatelessWidget {
     );
   }
 
-  Widget connectedClientsSection() {
+  Widget connectedClientsSection({required DashBoard dashBoardData}) {
     return Card(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 16.0.h),
@@ -152,7 +170,7 @@ class DashBoardScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "$connectedClient",
+                        dashBoardData.activeLeases.toString(),
                         style: TextStyle(
                             fontSize: 20.sp,
                             color: Color(0xff1f74f7),
@@ -177,7 +195,7 @@ class DashBoardScreen extends StatelessWidget {
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 8.0.h),
                           child: Text(
-                            "$connectedClient/$maximumCapacity IPs Used",
+                            "${dashBoardData.activeLeases}/${dashBoardData.poolSize} IPs Used",
                             style: TextStyle(
                                 fontSize: 12.sp,
                                 color: Colors.black,

@@ -13,28 +13,26 @@ class DashBoardScreen extends StatefulWidget {
 class _DashBoardScreenState extends State<DashBoardScreen> {
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: FutureBuilder(
-        future: widget.dashBoardData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            // Use snapshot.data instead of dashBoardData
-            final dashBoardData = snapshot.data!;
-            return Column(
-              children: [
-                serverStatusSection(dashBoardData: dashBoardData), // Pass data if needed
-                SizedBox(height: 12.0.h),
-                Expanded(child: connectedClientsSection(dashBoardData: dashBoardData)), // Pass data if needed
-              ],
-            );
-          }
-          return Center(child: Text('No data'));
+    return FutureBuilder(
+      future: widget.dashBoardData,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.hasData) {
+          // Use snapshot.data instead of dashBoardData
+          final dashBoardData = snapshot.data!;
+          return Column(
+            children: [
+              serverStatusSection(dashBoardData: dashBoardData), // Pass data if needed
+              SizedBox(height: 12.0.h),
+              Expanded(child: connectedClientsSection(dashBoardData: dashBoardData)), // Pass data if needed
+            ],
+          );
         }
-      ),
+        return Center(child: Text('No data'));
+      }
     );
   }
 

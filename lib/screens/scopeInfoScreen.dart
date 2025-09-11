@@ -86,7 +86,7 @@ class _ScopeInfoScreenState extends State<ScopeInfoScreen> {
                         )
                       ),
                       Text(
-                        scopeInfoData.subnetMask?.ipAddressToString ?? '',
+                        scopeInfoData.subnetMask ?? '',
                         style: TextStyle(
                           fontSize: 12.sp,
                           color: Colors.black,

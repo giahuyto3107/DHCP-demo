@@ -1,9 +1,9 @@
 class DashBoard {
-  int activeLeases;
-  String serverStatus;
-  String activeScope;
-  String gateway;
-  int poolSize;
+  final int activeLeases;
+  final String serverStatus;
+  final String activeScope;
+  final String gateway;
+  final int poolSize;
 
   DashBoard({
     required this.activeLeases,
@@ -14,51 +14,51 @@ class DashBoard {
   });
 
   factory DashBoard.fromJson(Map<String, dynamic> json) {
-    // Calculate subnet suffix from SubnetMask
+    // Get scope info
+    final scope = json['scope'] ?? {};
+
+    // Subnet suffix
     String subnetSuffix = '';
-    if (json['SubnetMask']?['IPAddressToString'] != null) {
-      final subnetMask = json['SubnetMask']['IPAddressToString'] as String;
-      final parts = subnetMask.split('.').map((e) => int.parse(e)).toList();
+    final subnetMaskStr = scope['SubnetMask']?['IPAddressToString'] as String?;
+    if (subnetMaskStr != null) {
+      final parts = subnetMaskStr.split('.').map(int.parse).toList();
       int bitCount = 0;
-      for (var part in parts) {
-        int partInt = part; // Ensure part is int
-        while (partInt > 0) {
-          bitCount += partInt & 1; // Bitwise AND
-          partInt >>= 1; // Right shift
+      for (final part in parts) {
+        int value = part;
+        while (value > 0) {
+          bitCount += value & 1;
+          value >>= 1;
         }
       }
       subnetSuffix = '/$bitCount';
     }
 
-    // Calculate poolSize from PoolRange
-    int poolSize = (json['PoolSize'] as num?)?.toInt() ?? 0;
-    if (['PoolRange'] != null) {
-      final RegExp ipRegex = RegExp(r"'IPAddressToString': '(\d+\.\d+\.\d+\.\d+)'");
-      final matches = ipRegex.allMatches(json['PoolRange'] as String).toList();
-      if (matches.length == 2) {
-        final startIp = matches[0].group(1)!;
-        final endIp = matches[1].group(1)!;
-        final startParts = startIp.split('.').map((e) => int.parse(e)).toList();
-        final endParts = endIp.split('.').map((e) => int.parse(e)).toList();
-        final startInt = (startParts[0] << 24) +
-            (startParts[1] << 16) +
-            (startParts[2] << 8) +
-            startParts[3];
-        final endInt = (endParts[0] << 24) +
-            (endParts[1] << 16) +
-            (endParts[2] << 8) +
-            endParts[3];
-        poolSize = endInt - startInt + 1; // Inclusive
-      }
+    // Pool size calculation
+    int poolSize = 0;
+    final poolStartStr = scope['PoolStart']?['IPAddressToString'] as String?;
+    final poolEndStr = scope['PoolEnd']?['IPAddressToString'] as String?;
+
+    if (poolStartStr != null && poolEndStr != null) {
+      List<int> ipToParts(String ip) => ip.split('.').map(int.parse).toList();
+      int toInt(List<int> parts) =>
+          (parts[0] << 24) + (parts[1] << 16) + (parts[2] << 8) + parts[3];
+
+      final startInt = toInt(ipToParts(poolStartStr));
+      final endInt = toInt(ipToParts(poolEndStr));
+      poolSize = endInt - startInt + 1;
+    }
+
+    // Active scope (use network + subnet suffix)
+    String activeScope = '';
+    if (scope['Gateway'] != null && subnetSuffix.isNotEmpty) {
+      activeScope = '${scope['Gateway']}$subnetSuffix';
     }
 
     return DashBoard(
-      activeLeases: (json['ActiveLeases'] as num?)?.toInt() ?? 0,
-      serverStatus: json['ServerStatus']?.toString() ?? 'Unknown',
-      activeScope: json['ScopeId'] != null
-          ? '${json['ScopeId']}$subnetSuffix'
-          : '',
-      gateway: json['Gateway']?.toString() ?? '',
+      activeLeases: (json['leases']?['activeCount'] as num?)?.toInt() ?? 0,
+      serverStatus: json['serverStatus']?.toString() ?? 'Unknown',
+      activeScope: activeScope,
+      gateway: scope['Gateway']?.toString() ?? '',
       poolSize: poolSize,
     );
   }

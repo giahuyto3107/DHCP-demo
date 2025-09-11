@@ -14,54 +14,52 @@ class _LeaseListScreenState extends State<LeaseListScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return Expanded(
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 16.0.h, horizontal: 16.0.w),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.devices),
-                  SizedBox(width: 8.0.h),
-                  Text(
-                    "Active Leases",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 8.0.h),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: FutureBuilder(
-                    future: widget.leaseData,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else if (snapshot.hasData) {
-                        // Use snapshot.data instead of dashBoardData
-                        final leaseData = snapshot.data!;
-                        return Column(
-                          children: List.generate(leaseData.length, (index) {
-                            return deviceDetailCard(leaseData: leaseData[index]);
-                          }).toList(),
-                        );
-                      } else {
-                        return Center(child: Text("No data"));
-                      }
-                    }
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 16.0.h, horizontal: 16.0.w),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(Icons.devices),
+                SizedBox(width: 8.0.h),
+                Text(
+                  "Active Leases",
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500
                   ),
                 ),
-              )
+              ],
+            ),
+            SizedBox(height: 8.0.h),
+            Expanded(
+              child: SingleChildScrollView(
+                child: FutureBuilder(
+                  future: widget.leaseData,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (snapshot.hasData) {
+                      // Use snapshot.data instead of dashBoardData
+                      final leaseData = snapshot.data!;
+                      return Column(
+                        children: List.generate(leaseData.length, (index) {
+                          return deviceDetailCard(leaseData: leaseData[index]);
+                        }).toList(),
+                      );
+                    } else {
+                      return Center(child: Text("No data"));
+                    }
+                  }
+                ),
+              ),
+            )
 
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -130,7 +128,7 @@ class _LeaseListScreenState extends State<LeaseListScreen> {
                   ),
                 ),
                 Text(
-                  leaseData.hostName ?? "Unknown",
+                  leaseData.hostName == "" ? "Unknown" : leaseData.hostName,
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: Color(0xff757c8a),

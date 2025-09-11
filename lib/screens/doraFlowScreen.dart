@@ -36,116 +36,114 @@ class _DoraFlowScreenState extends State<DoraFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 16.0.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    "DHCP Process",
-                    style: TextStyle(
-                        fontSize: 16.sp,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500
-                    ),
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 16.0.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  "DHCP Process",
+                  style: TextStyle(
+                      fontSize: 16.sp,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500
                   ),
-                ],
-              ),
-              SizedBox(height: 12.0.h),
-
-              Center(
-                child: ElevatedButton(
-                  onPressed: startAnimation,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0.h),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.play_arrow_outlined),
-                        SizedBox(width: 8.0.w),
-                        Text(
-                          "Replay DHCP Process",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700
-                          ),
-                        )
-                      ],
-                    ),
-                  )
                 ),
+              ],
+            ),
+            SizedBox(height: 12.0.h),
+
+            Center(
+              child: ElevatedButton(
+                onPressed: startAnimation,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0.h),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.play_arrow_outlined),
+                      SizedBox(width: 8.0.w),
+                      Text(
+                        "Replay DHCP Process",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700
+                        ),
+                      )
+                    ],
+                  ),
+                )
               ),
-              SizedBox(height: 12.0.h),
-              Expanded(
-                child: Card(
-                  color: Color(0xfffafcff),
-                  elevation: 0,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0.h, horizontal: 16.0.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Color(0xffe2eefe),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Icon(Icons.tv, color: Color(0xff0874f7),),
-                              ),
+            ),
+            SizedBox(height: 12.0.h),
+            Expanded(
+              child: Card(
+                color: Color(0xfffafcff),
+                elevation: 0,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0.h, horizontal: 16.0.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Color(0xffe2eefe),
+                              borderRadius: BorderRadius.circular(30),
                             ),
-                            SizedBox(height: 6.0.h),
-                            Text(
-                              "Client",
-                              style: TextStyle(
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Icon(Icons.tv, color: Color(0xff0874f7),),
+                            ),
+                          ),
+                          SizedBox(height: 6.0.h),
+                          Text(
+                            "Client",
+                            style: TextStyle(
+                              fontSize: 10.sp,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500
+                            ),
+                          ),
+
+                          SizedBox(height: 16.0.h),
+
+                          // Animation section
+                          animationSection(),
+
+                          SizedBox(height: 16.0.h),
+
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Color(0xffe3f2ec),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Icon(Icons.data_usage, color: Color(0xff16a249),),
+                            ),
+                          ),
+                          SizedBox(height: 6.0.h),
+                          Text(
+                            "DHCP Server",
+                            style: TextStyle(
                                 fontSize: 10.sp,
                                 color: Colors.black,
                                 fontWeight: FontWeight.w500
-                              ),
                             ),
-
-                            SizedBox(height: 16.0.h),
-
-                            // Animation section
-                            animationSection(),
-
-                            SizedBox(height: 16.0.h),
-
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Color(0xffe3f2ec),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Icon(Icons.data_usage, color: Color(0xff16a249),),
-                              ),
-                            ),
-                            SizedBox(height: 6.0.h),
-                            Text(
-                              "DHCP Server",
-                              style: TextStyle(
-                                  fontSize: 10.sp,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );

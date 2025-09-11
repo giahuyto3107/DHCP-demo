@@ -65,7 +65,9 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                     borderRadius: BorderRadius.circular(30),
                     color: dashBoardData.serverStatus.toLowerCase() == "offline"
                       ? Colors.red
-                      : Color(0xff16a249)
+                      : dashBoardData.serverStatus.toLowerCase() == "online"
+                        ? Color(0xff16a249)
+                        : Colors.grey // Unknown
                   ),
                   height: 20.h,
                   width: 20.w,

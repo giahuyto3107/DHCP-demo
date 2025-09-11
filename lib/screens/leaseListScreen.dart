@@ -11,9 +11,17 @@ class LeaseListScreen extends StatefulWidget {
 }
 
 class _LeaseListScreenState extends State<LeaseListScreen> {
+  String formatDuration(Duration? duration) {
+    if (duration == null) return 'Unknown';
+    if (duration.isNegative) return 'Expired';
+    final days = duration.inDays;
+    final hours = duration.inHours % 24 + (days*24);
+    final minutes = duration.inMinutes % 60;
+    return '${hours}h ${minutes}m';
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Card(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 16.0.h, horizontal: 16.0.w),
@@ -66,32 +74,66 @@ class _LeaseListScreenState extends State<LeaseListScreen> {
   }
 
   Widget deviceDetailCard({required Lease leaseData}) {
+    final timeLeft = leaseData.leaseExpiryTime != null
+      ? leaseData.leaseExpiryTime!.difference(DateTime.now())
+      : null;
+
     return Card(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 12.0.h, horizontal: 12.0.w),
         child: Column(
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(
-                  getHostDevice(hostName: leaseData.hostName ?? 'Unknown') == "laptop"
-                    ? Icons.laptop
-                    : getHostDevice(hostName: leaseData.hostName ?? 'Unknown')  == "mobile"
-                      ? Icons.phone_android
-                      : getHostDevice(hostName: leaseData.hostName ?? 'Unknown')  == "tv"
-                        ? Icons.tv
-                        : getHostDevice(hostName: leaseData.hostName ?? 'Unknown') == "pc"
-                          ? Icons.important_devices
-                          : Icons.device_unknown
+                Row(
+                  children: [
+                    Icon(
+                      getHostDevice(hostName: leaseData.hostName ?? 'Unknown') == "laptop"
+                        ? Icons.laptop
+                        : getHostDevice(hostName: leaseData.hostName ?? 'Unknown')  == "mobile"
+                          ? Icons.phone_android
+                          : getHostDevice(hostName: leaseData.hostName ?? 'Unknown')  == "tv"
+                            ? Icons.tv
+                            : getHostDevice(hostName: leaseData.hostName ?? 'Unknown') == "pc"
+                              ? Icons.important_devices
+                              : Icons.device_unknown
+                    ),
+                    SizedBox(width: 6.w),
+                    Text(
+                      leaseData.ipAddress,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500
+                      )
+                    )
+                  ],
                 ),
-                SizedBox(width: 6.w),
-                Text(
-                  leaseData.ipAddress,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500
-                  )
+
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.circular(30),
+                    side: BorderSide(width: 0.75, color: Color(0xff757c8a))
+                  ),
+                  color: timeLeft != null && timeLeft.isNegative ? Colors.red.shade100 : null,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 2.0.h, horizontal: 8.0.w),
+                    child: Row(
+                      children: [
+                        Icon(Icons.access_time),
+                        SizedBox(width: 4.w),
+                        Text(
+                          formatDuration(timeLeft),
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 )
               ],
             ),

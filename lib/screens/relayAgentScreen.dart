@@ -59,6 +59,10 @@ class _RelayAgentScreenState extends State<RelayAgentScreen> {
                 ),
               ],
             ),
+            SizedBox(height: 20.0.h),
+
+            // ipSection(),
+
             SizedBox(height: 12.0.h),
 
             Center(
@@ -182,6 +186,36 @@ class _RelayAgentScreenState extends State<RelayAgentScreen> {
       ),
     );
   }
+
+  // Widget ipSection() {
+  //   return Padding(
+  //     padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           "Relay Agent IP",
+  //            style: TextStyle(
+  //               fontWeight: FontWeight.bold,
+  //            ),
+  //         ),
+  //         SizedBox(height: 8.0.h,),
+  //         DropdownButton(
+  //           items: items,
+  //             onChanged: onChanged
+  //         )
+  //
+  //         SizedBox(height: 16.0.h),
+  //         Text(
+  //           "Remote DHCP Server",
+  //           style: TextStyle(
+  //             fontWeight: FontWeight.bold,
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget animationSection() {
     return SizedBox(

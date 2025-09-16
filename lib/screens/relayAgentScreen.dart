@@ -1,14 +1,16 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:demo_dhcp_windows/models/relayAgent.dart';
 
-class RelayAgent extends StatefulWidget {
+class RelayAgentScreen extends StatefulWidget {
+  final Future<RelayAgent> relayAgentData;
+  const RelayAgentScreen({super.key, required this.relayAgentData});
+
   @override
-  State<RelayAgent> createState() => _RelayAgentState();
+  State<RelayAgentScreen> createState() => _RelayAgentScreenState();
 }
 
-class _RelayAgentState extends State<RelayAgent> {
+class _RelayAgentScreenState extends State<RelayAgentScreen> {
   final int itemCount = 7;
   final String macClient = "abc:def";
   final dhcpServerIp = "abc";
@@ -90,80 +92,91 @@ class _RelayAgentState extends State<RelayAgent> {
                   child: SingleChildScrollView(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0.h, horizontal: 16.0.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Color(0xffe2eefe),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Icon(Icons.tv, color: Color(0xff0874f7),),
-                            ),
-                          ),
-                          SizedBox(height: 6.0.h),
-                          Text(
-                            "Client",
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500
-                            ),
-                          ),
-                          SizedBox(height: 4.0.h),
-                          Text(
-                            "MAC: $macClient",
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Color(0xff969ca7),
-                              fontWeight: FontWeight.w600
-                            ),
-                          ),
-                          SizedBox(height: 16.0.h),
+                      child: FutureBuilder(
+                        future: widget.relayAgentData,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            final relayAgent = snapshot.data!;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xffe2eefe),
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Icon(Icons.tv, color: Color(0xff0874f7),),
+                                  ),
+                                ),
+                                SizedBox(height: 6.0.h),
+                                Text(
+                                  "Client",
+                                  style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500
+                                  ),
+                                ),
+                                SizedBox(height: 4.0.h),
+                                Text(
+                                  "MAC: ${relayAgent.macOfClient}",
+                                  style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: Color(0xff969ca7),
+                                      fontWeight: FontWeight.w600
+                                  ),
+                                ),
+                                SizedBox(height: 16.0.h),
 
-                          // Animation section
-                          animationSection(),
+                                // Animation section
+                                animationSection(),
 
-                          SizedBox(height: 16.0.h),
+                                SizedBox(height: 16.0.h),
 
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Color(0xffe3f2ec),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Icon(Icons.data_usage, color: Color(0xff16a249),),
-                            ),
-                          ),
-                          SizedBox(height: 6.0.h),
-                          Text(
-                            "DHCP Server",
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500
-                            ),
-                          ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xffe3f2ec),
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Icon(Icons.data_usage, color: Color(0xff16a249),),
+                                  ),
+                                ),
+                                SizedBox(height: 6.0.h),
+                                Text(
+                                  "DHCP Server",
+                                  style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500
+                                  ),
+                                ),
 
-                          SizedBox(height: 4.0.h),
-                          Text(
-                            dhcpServerIp,
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Color(0xff969ca7),
-                              fontWeight: FontWeight.w600
-                            ),
-                          ),
-                        ],
+                                SizedBox(height: 4.0.h),
+                                Text(
+                                  relayAgent.remoteDhcpServerIp,
+                                  style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: Color(0xff969ca7),
+                                      fontWeight: FontWeight.w600
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                        }),
                       ),
                     ),
                   ),
                 ),
               ),
-            )
           ],
         ),
       ),

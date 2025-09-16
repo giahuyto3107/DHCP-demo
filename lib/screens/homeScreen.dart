@@ -1,4 +1,5 @@
 import 'package:demo_dhcp_windows/apiServices/apiServices.dart';
+import 'package:demo_dhcp_windows/models/relayAgent.dart';
 import 'package:demo_dhcp_windows/models/dashBoard.dart';
 import 'package:demo_dhcp_windows/models/lease.dart';
 import 'package:demo_dhcp_windows/models/scopeInfo.dart';
@@ -23,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<DashBoard> _dashBoardFuture;
   late Future<ScopeInfo> _scopeInfoFuture;
   late Future<List<Lease>> _leaseListFuture;
+  late Future<RelayAgent> _relayAgent;
 
   @override
   void initState() {
@@ -32,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _dashBoardFuture = fetchDashBoardData(apiService);
     _scopeInfoFuture = fetchScopeInfo(apiService);
     _leaseListFuture = fetchLeaseList(apiService);
+    _relayAgent = fetchRelayAgent(apiService);
   }
 
   Future<DashBoard> fetchDashBoardData(ApiService apiService) async {
@@ -67,6 +70,17 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<RelayAgent> fetchRelayAgent(ApiService apiService) async {
+    try {
+      final data = await apiService.fetchRelayAgent();
+      print(data);
+      return data;
+    } catch (e) {
+      print('Error with fetching dashboard data: $e');
+      rethrow;
+    }
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -79,7 +93,9 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (_selectedIndex == 1) {
       return DoraFlowScreen();
     } else if (_selectedIndex == 2) {
-      return RelayAgent();
+      return RelayAgentScreen(
+        relayAgentData: _relayAgent
+      );
     } else if (_selectedIndex == 3) {
       return LeaseListScreen(leaseData: _leaseListFuture);
     } else {
@@ -133,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     _dashBoardFuture = fetchDashBoardData(apiService);
                     _scopeInfoFuture = fetchScopeInfo(apiService);
                     _leaseListFuture = fetchLeaseList(apiService);
+                    _relayAgent = fetchRelayAgent(apiService);
                   });
                 },
                 child: Row(

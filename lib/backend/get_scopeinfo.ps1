@@ -12,14 +12,28 @@ if (-not $scope) {
 $gateway = ($options | Where-Object { $_.OptionId -eq 3 }).Value
 $dns = ($options | Where-Object { $_.OptionId -eq 6 }).Value
 
+# Calculate CIDR prefix length
+$maskOctets = $scope.SubnetMask -split '\.'
+$prefixLength = 0
+foreach ($octet in $maskOctets) {
+    $binary = [convert]::ToString([int]$octet, 2).PadLeft(8, '0')
+    $prefixLength += ($binary.ToCharArray() | Where-Object { $_ -eq '1' }).Count
+}
+$networkCidr = $scope.SubnetAddress + "/$prefixLength"
+
+$poolRange = "$($scope.StartRange) - $($scope.EndRange)"
+
 $result = [PSCustomObject]@{
-    Network    = $scope.SubnetAddress
-    SubnetMask = $scope.SubnetMask
-    Gateway    = $gateway -join ", "
-    DnsServer  = $dns -join ", "
-    PoolStart  = $scope.StartRange
-    PoolEnd    = $scope.EndRange
-    PoolSize   = ($scope.EndRange.Address - $scope.StartRange.Address + 1)
+    NetworkCidr = $networkCidr  # e.g., "192.168.2.0/24"
+    Network     = $scope.SubnetAddress
+    SubnetMask  = $scope.SubnetMask
+    Gateway     = $gateway -join ", "
+    DnsServer   = $dns -join ", "
+    PoolRange   = $poolRange    # e.g., "192.168.2.100 - 192.168.2.200"
+    PoolStart   = $scope.StartRange
+    PoolEnd     = $scope.EndRange
+    PoolSize    = ($scope.EndRange.Address - $scope.StartRange.Address + 1)
+    # NumberOfLeases added in Python
 }
 
 $result | ConvertTo-Json -Depth 3

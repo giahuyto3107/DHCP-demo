@@ -8,11 +8,18 @@ if (-not $leases) {
     exit
 }
 
-$result = $leases | Select-Object `
-    IPAddress,
-    ScopeId,
-    ClientId,
-    HostName,
-    AddressState
+$result = $leases | Select-Object @{
+    Name = 'IPAddress'; Expression = { $_.IPAddress.ToString() }
+}, @{
+    Name = 'ScopeId'; Expression = { $_.ScopeId.ToString() }
+}, @{
+    Name = 'ClientId'; Expression = { $_.ClientId }
+}, @{
+    Name = 'HostName'; Expression = { $_.HostName }
+}, @{
+    Name = 'AddressState'; Expression = { $_.AddressState }
+}, @{
+    Name = 'LeaseExpiryTime'; Expression = { $_.LeaseExpiryTime.ToString("yyyy-MM-ddTHH:mm:ss") }
+}
 
 $result | ConvertTo-Json -Depth 3

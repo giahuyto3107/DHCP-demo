@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:demo_dhcp_windows/apiServices/apiConfig.dart';
 import 'package:demo_dhcp_windows/models/dashBoard.dart';
+import 'package:demo_dhcp_windows/models/relayAgent.dart';
 import 'package:demo_dhcp_windows/models/scopeInfo.dart';
 import 'package:http/http.dart' as http;
 
@@ -58,7 +59,7 @@ class ApiService {
     }
   }
 
-  Future<ScopeInfo> fetchScopeInfo() async{
+  Future <ScopeInfo> fetchScopeInfo() async {
     final url = Uri.parse('${ApiConfig.baseUrl}/api/scopeinfo');
     final response = await http.get(url);
 
@@ -77,6 +78,30 @@ class ApiService {
     } else {
       throw AppErrorException(
         "fetchScopeInfo",
+        "404:Mobile_DP",
+        "Địa chỉ truy cập không tồn tại.",
+      );
+    }
+  }
+
+  Future <RelayAgent> fetchRelayAgent() async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/api/relay');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      try {
+        final dynamic data = json.decode(response.body);
+        return RelayAgent.fromJson(data);
+      } catch (e) {
+        print("Error parsing JSON: $e");
+        throw AppErrorException(
+          "fetchRelayAgent",
+          "500:Mobile_DP",
+          "Lỗi dữ liệu khi tải danh sách scopeInfo.",
+        );
+      }
+    } else {
+      throw AppErrorException(
+        "fetchRelayAgent",
         "404:Mobile_DP",
         "Địa chỉ truy cập không tồn tại.",
       );

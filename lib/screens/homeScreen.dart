@@ -5,6 +5,7 @@ import 'package:demo_dhcp_windows/models/scopeInfo.dart';
 import 'package:demo_dhcp_windows/screens/dashBoard.dart';
 import 'package:demo_dhcp_windows/screens/doraFlowScreen.dart';
 import 'package:demo_dhcp_windows/screens/leaseListScreen.dart';
+import 'package:demo_dhcp_windows/screens/relayAgentScreen.dart';
 import 'package:demo_dhcp_windows/screens/scopeInfoScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -78,9 +79,10 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (_selectedIndex == 1) {
       return DoraFlowScreen();
     } else if (_selectedIndex == 2) {
+      return RelayAgent();
+    } else if (_selectedIndex == 3) {
       return LeaseListScreen(leaseData: _leaseListFuture);
     } else {
-      // Pass both scopeInfoData and dashBoardData to handle activeLeases
       return ScopeInfoScreen(
         scopeInfoData: _scopeInfoFuture,
         dashBoardData: _dashBoardFuture,
@@ -115,35 +117,43 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               SizedBox(height: 16.0.h),
-              Container(
-                color: Color(0xffffffff),
-                child: InkWell(
-                  child: Column(
-                    children: [
-                      Icon(Icons.refresh),
-                      Text(
-                        "Refresh",
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      )
-                    ],
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white, // same as your Container color
+                  foregroundColor: Colors.black, // icon + text color
+                  padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                  elevation: 2, // small shadow
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  onTap: () {
-                    setState(() {
-                      final apiService = Provider.of<ApiService>(context, listen: false);
-                      _dashBoardFuture = fetchDashBoardData(apiService);
-                      _scopeInfoFuture = fetchScopeInfo(apiService);
-                      _leaseListFuture = fetchLeaseList(apiService);
-                    });
-                  },
+                ),
+                onPressed: () {
+                  setState(() {
+                    final apiService = Provider.of<ApiService>(context, listen: false);
+                    _dashBoardFuture = fetchDashBoardData(apiService);
+                    _scopeInfoFuture = fetchScopeInfo(apiService);
+                    _leaseListFuture = fetchLeaseList(apiService);
+                  });
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.refresh, size: 24.sp),
+                    SizedBox(width: 8.0.w),
+                    Text(
+                      "Refresh",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: 16.0.h),
+
+            SizedBox(height: 16.h),
               navigationTab(
-                titles: ['Dashboard', 'Dora Flow', 'Lease List', 'Scope Info'],
+                titles: ['Dashboard', 'Dora Flow', 'Relay Agent', 'Lease List', 'Scope Info'],
               ),
               SizedBox(height: 8.0.h),
               Expanded(child: contentSection()),

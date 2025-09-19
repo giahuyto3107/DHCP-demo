@@ -20,10 +20,18 @@ class ScopeInfo {
   });
 
   factory ScopeInfo.fromJson(Map<String, dynamic> json) {
-    // Extract SubnetMask string
-    final subnetMaskStr = json['SubnetMask']?['IPAddressToString']?.toString() ?? "";
+    print('ScopeInfo JSON input: $json'); // Debug input
 
-    // Calculate subnet suffix if mask exists
+    // Extract fields with fallbacks
+    final subnetMaskStr = json['SubnetMask']?['IPAddressToString']?.toString() ?? "";
+    final poolStartStr = json['PoolStart']?['IPAddressToString']?.toString() ?? "";
+    final poolEndStr = json['PoolEnd']?['IPAddressToString']?.toString() ?? "";
+
+    // Use API-provided poolSize
+    final poolSize = (json['PoolSize'] as num?)?.toInt() ?? 0;
+
+    // Calculate network and subnet suffix
+    String network = json['Network']?.toString() ?? "";
     String subnetSuffix = '';
     if (subnetMaskStr.isNotEmpty) {
       final parts = subnetMaskStr.split('.').map(int.parse).toList();
@@ -37,39 +45,25 @@ class ScopeInfo {
       }
       subnetSuffix = '/$bitCount';
     }
-
-    // Calculate network (fallback if missing)
-    String network = json['Network']?.toString() ?? '';
     if (network.isEmpty && json['Gateway'] != null && subnetMaskStr.isNotEmpty) {
       final gatewayParts = (json['Gateway'] as String).split('.').map(int.parse).toList();
       final subnetParts = subnetMaskStr.split('.').map(int.parse).toList();
       network = List.generate(4, (i) => gatewayParts[i] & subnetParts[i]).join('.');
     }
-
-    // Pool start and end (safe fallback to "")
-    String poolStart = json['PoolStart']?['IPAddressToString']?.toString() ?? "";
-    String poolEnd = json['PoolEnd']?['IPAddressToString']?.toString() ?? "";
-
-    // Calculate pool size (fallback to 0)
-    int poolSize = 0;
-    if (poolStart.isNotEmpty && poolEnd.isNotEmpty) {
-      final startParts = poolStart.split('.').map(int.parse).toList();
-      final endParts = poolEnd.split('.').map(int.parse).toList();
-      final startInt =
-          (startParts[0] << 24) + (startParts[1] << 16) + (startParts[2] << 8) + startParts[3];
-      final endInt =
-          (endParts[0] << 24) + (endParts[1] << 16) + (endParts[2] << 8) + endParts[3];
-      poolSize = endInt - startInt + 1;
+    if (network.isNotEmpty && subnetSuffix.isNotEmpty) {
+      network = "$network$subnetSuffix";
+    } else if (json['NetworkCidr'] != null) {
+      network = json['NetworkCidr'].toString(); // Fallback to NetworkCidr if available
     }
 
     return ScopeInfo(
-      activeLeases: (json['ActiveLeases'] as num?)?.toInt() ?? 0,
+      activeLeases: (json['NumberOfLeases'] as num?)?.toInt() ?? 0, // Changed to NumberOfLeases
       dnsServer: json['DnsServer']?.toString() ?? "",
       gateway: json['Gateway']?.toString() ?? "",
-      poolStart: poolStart,
-      poolEnd: poolEnd,
+      poolStart: poolStartStr,
+      poolEnd: poolEndStr,
       poolSize: poolSize,
-      network: network.isNotEmpty ? "$network$subnetSuffix" : "",
+      network: network,
       subnetMask: subnetMaskStr,
     );
   }

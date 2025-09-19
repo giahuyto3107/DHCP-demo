@@ -14,26 +14,25 @@ class DashBoard {
   });
 
   factory DashBoard.fromJson(Map<String, dynamic> json) {
-    // Get scope info
-    // Pool size calculation
-    int poolSize = 0;
-    final poolStartStr = json['poolRange']?['start'] as String?;
-    final poolEndStr = json['poolRange']?['end'] as String?;
+    print('Dashboard JSON input: $json'); // Debug input
 
-    if (poolStartStr != null && poolEndStr != null) {
-      List<int> ipToParts(String ip) => ip.split('.').map(int.parse).toList();
-      int toInt(List<int> parts) =>
-          (parts[0] << 24) + (parts[1] << 16) + (parts[2] << 8) + parts[3];
-
-      final startInt = toInt(ipToParts(poolStartStr));
-      final endInt = toInt(ipToParts(poolEndStr));
-      poolSize = endInt - startInt + 1;
+    // Parse poolRange string (e.g., "192.168.1.11 - 192.168.1.99")
+    int poolSize = json['poolSize']?.toInt() ?? 0; // Use API-provided poolSize
+    final poolRangeStr = json['poolRange']?.toString() ?? '';
+    String? poolStartStr;
+    String? poolEndStr;
+    if (poolRangeStr.isNotEmpty) {
+      final parts = poolRangeStr.split(' - ');
+      if (parts.length == 2) {
+        poolStartStr = parts[0]; // e.g., "192.168.1.11"
+        poolEndStr = parts[1];   // e.g., "192.168.1.99"
+      }
     }
 
     return DashBoard(
       activeLeases: (json['numberOfLeases'] as num?)?.toInt() ?? 0,
       serverStatus: json['serverStatus']?.toString() ?? 'Unknown',
-      activeScope: json['activeScope'],
+      activeScope: json['activeScope']?.toString() ?? '',
       gateway: json['gateway']?.toString() ?? '',
       poolSize: poolSize,
     );

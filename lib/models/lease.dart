@@ -14,21 +14,31 @@ class Lease {
   });
 
   factory Lease.fromJson(Map<String, dynamic> json) {
+    print('Lease JSON input: $json'); // Debug input
     DateTime? leaseExpiryTime;
     if (json['LeaseExpiryTime'] != null) {
-      final match = RegExp(r'\/Date\((\d+)\)\/').firstMatch(json['LeaseExpiryTime']);
-      if (match != null) {
-        final milliseconds = int.parse(match.group(1)!);
-        leaseExpiryTime = DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true).toLocal();
+      final leaseExpiryStr = json['LeaseExpiryTime'].toString();
+      try {
+        // Try Microsoft JSON date format (e.g., "/Date(1758972413276)/")
+        final match = RegExp(r'\/Date\((\d+)\)\/').firstMatch(leaseExpiryStr);
+        if (match != null) {
+          final milliseconds = int.parse(match.group(1)!);
+          leaseExpiryTime = DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true).toLocal();
+        } else {
+          // Try ISO 8601 format (e.g., "2025-09-26T20:26:53")
+          leaseExpiryTime = DateTime.parse(leaseExpiryStr).toLocal();
+        }
+      } catch (e) {
+        print('Error parsing LeaseExpiryTime: $e');
       }
     }
-    print(leaseExpiryTime);
+    print('Parsed leaseExpiryTime: $leaseExpiryTime');
 
     return Lease(
-      addressState: json['AddressState'] ?? "",
-      macAddress: json['ClientId'] ?? "",
-      hostName: json['HostName'] ?? "", // keep null if missing
-      ipAddress: json['IPAddress']?['IPAddressToString'] ?? "",
+      addressState: json['AddressState']?.toString() ?? "",
+      macAddress: json['ClientId']?.toString() ?? "",
+      hostName: json['HostName']?.toString() ?? "",
+      ipAddress: json['IPAddress']?.toString() ?? "", // Fix: Use string directly
       leaseExpiryTime: leaseExpiryTime,
     );
   }

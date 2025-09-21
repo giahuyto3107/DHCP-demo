@@ -1,7 +1,8 @@
-DHCP-demo
+# DHCP-demo
 
 A demo application for monitoring DHCP server scopes and leases with a mobile Flutter app (client) and a Flask API (backend) connected to PowerShell scripts.
 
+```plaintext
 📂 Project Structure
 DHCP-demo/
 │
@@ -18,8 +19,15 @@ DHCP-demo/
 │   ├── get_leases.ps1         # PowerShell script to fetch leases
 │   ├── get_scopeinfo.ps1      # PowerShell script to fetch scope info
 │   └── get_scopes.ps1         # PowerShell script to fetch available scopes
+│
+└── build/
+    └── app/
+        └── outputs/
+            └── flutter-apk/
+                └── app-release.apk  # Compiled APK file
+```
 
-📱 App Features
+# 📱 App Features
 
 - Dashboard View
 + Displays DHCP server status (Online/Offline), running scopes, connected clients, and quick stats.
@@ -33,11 +41,12 @@ DHCP-demo/
 - DORA Flow (Discover, Offer, Request, Acknowledge)
 + Visual animation illustrating how DHCP works between client and server.
 
-⚙️ Configuration
-- API Configuration (Backend)
+# ⚙️ Configuration
+API Configuration (Backend):
+  
 Edit dhcp_api.py and configure your default Scope ID:
 
-# Default scope matches lease data
+#Default scope matches lease data
 SCOPE_ID = "192.168.1.0"
 
 
@@ -47,7 +56,8 @@ You can also pass the scope dynamically as a query parameter:
 http://<server-ip>:5001/api/leases?scope=192.168.1.0
 
 
-▶️ Running the Project
+# ▶️ Running the Project
+
 Backend (Flask API)
 
 Install dependencies:
@@ -59,8 +69,27 @@ Run the API:
 The API will start on:
   http://0.0.0.0:5001
 
+# 📦 Install APK
 
-🌐 Networking Setup
+You can run the app directly on an Android device:
+
+Locate the APK file:
+
+DHCP-demo\build\app\outputs\flutter-apk\app-release.apk
+
+
+Transfer the file to your Android device.
+
+Enable “Install from unknown sources” in your phone settings.
+
+Tap the APK file to install the app.
+
+Open the app and configure the API IP & Port.
+
+# 📺 Watch demo/tutorial on YouTube: 👉 https://youtu.be/zlPj2q9ntO8
+
+
+# 🌐 Networking Setup
 
 To allow the host PC to access the API URL:
 
@@ -74,9 +103,9 @@ Run in PowerShell (as Administrator):
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
 
-⚠️ Note: Turning off the firewall is only recommended for local testing. For production, configure proper firewall rules instead.
+# ⚠️ Note: Turning off the firewall is only recommended for local testing. For production, configure proper firewall rules instead.
 
-🔧 Troubleshooting
+# 🔧 Troubleshooting
 
 If API fetching doesn’t work and the console seems stuck, press Ctrl + C in the command prompt running the Flask server, then restart it.
 

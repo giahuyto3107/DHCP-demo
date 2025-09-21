@@ -20,11 +20,8 @@ DHCP-demo/
 │   ├── get_scopeinfo.ps1      # PowerShell script to fetch scope info
 │   └── get_scopes.ps1         # PowerShell script to fetch available scopes
 │
-└── build/
-    └── app/
-        └── outputs/
-            └── flutter-apk/
-                └── app-release.apk  # Compiled APK file
+├── apk/
+    └── dhcp_demo_app.apk    # Compiled APK file
 ```
 
 # 📱 App Features
@@ -75,7 +72,7 @@ You can run the app directly on an Android device:
 
 Locate the APK file:
 
-DHCP-demo\build\app\outputs\flutter-apk\app-release.apk
+DHCP-demo\apk\dhcp_demo_app.apk
 
 
 Transfer the file to your Android device.

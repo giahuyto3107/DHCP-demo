@@ -1,3 +1,4 @@
+import 'package:demo_dhcp_windows/apiServices/apiConfig.dart';
 import 'package:demo_dhcp_windows/apiServices/apiServices.dart';
 import 'package:demo_dhcp_windows/models/relayAgent.dart';
 import 'package:demo_dhcp_windows/models/dashBoard.dart';
@@ -7,6 +8,7 @@ import 'package:demo_dhcp_windows/screens/dashBoard.dart';
 import 'package:demo_dhcp_windows/screens/doraFlowScreen.dart';
 import 'package:demo_dhcp_windows/screens/leaseListScreen.dart';
 import 'package:demo_dhcp_windows/screens/scopeInfoScreen.dart';
+import 'package:demo_dhcp_windows/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +25,10 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<DashBoard> _dashBoardFuture;
   late Future<ScopeInfo> _scopeInfoFuture;
   late Future<List<Lease>> _leaseListFuture;
+  final TextEditingController ipAddressController = TextEditingController();
+  final TextEditingController portController = TextEditingController();
+  final ipFocus = FocusNode();
+  final portFocus = FocusNode();
   // late Future<RelayAgent> _relayAgent;
 
   @override
@@ -34,6 +40,23 @@ class _HomeScreenState extends State<HomeScreen> {
     _scopeInfoFuture = fetchScopeInfo(apiService);
     _leaseListFuture = fetchLeaseList(apiService);
     // _relayAgent = fetchRelayAgent(apiService);
+  }
+
+  void restart() {
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    _dashBoardFuture = fetchDashBoardData(apiService);
+    _scopeInfoFuture = fetchScopeInfo(apiService);
+    _leaseListFuture = fetchLeaseList(apiService);
+    // _relayAgent = fetchRelayAgent(apiService);
+  }
+
+  @override
+  void dispose() {
+    ipAddressController.dispose();
+    portController.dispose();
+    ipFocus.dispose();
+    portFocus.dispose();
+    super.dispose();
   }
 
   Future<DashBoard> fetchDashBoardData(ApiService apiService) async {
@@ -111,6 +134,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xfff9fafb),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showConfigureModal(context);
+        },
+        child: Icon(Icons.edit),
+        backgroundColor: Colors.black,
+      ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.0.w),
@@ -146,11 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 onPressed: () {
                   setState(() {
-                    final apiService = Provider.of<ApiService>(context, listen: false);
-                    _dashBoardFuture = fetchDashBoardData(apiService);
-                    _scopeInfoFuture = fetchScopeInfo(apiService);
-                    _leaseListFuture = fetchLeaseList(apiService);
-                    // _relayAgent = fetchRelayAgent(apiService);
+                    restart();
                   });
                 },
                 child: Row(
@@ -159,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Icon(Icons.refresh, size: 24.sp),
                     SizedBox(width: 8.0.w),
                     Text(
-                      "Refresh",
+                      "Restart",
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w400,
@@ -245,6 +271,151 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         }),
+      ),
+    );
+  }
+
+  void _showConfigureModal(BuildContext outerContext) {
+    showDialog(
+      context: outerContext,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'IP Configuration',
+                      style: TextStyle(
+                        fontSize: 25.sp,
+                        fontWeight: FontWeight.bold,
+                      )
+                    ),
+                    Spacer(),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                      },
+                      icon: Icon(Icons.cancel),
+                    )
+                  ],
+                ),
+                SizedBox(height: 32.0.h,),
+                textFieldSection(
+                  controller: ipAddressController,
+                  hintText: 'e.g: 192.168.1.1',
+                  labelText: 'Wifi\'s ip address of windows server',
+                  focusNode: ipFocus,
+                  nextFocusNode: portFocus,
+                  autofocus: true,
+                ),
+                SizedBox(height: 16.0.h,),
+                textFieldSection(
+                  controller: portController,
+                  hintText: 'e.g: 5000',
+                  labelText: 'Port of windows server',
+                  focusNode: portFocus,
+                ),
+                SizedBox(height: 32.0.h,),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      handleDialogCancel(dialogContext);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xff0B0B0B),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      'Configure',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void handleDialogCancel(BuildContext context) {
+    bool ipAddressValid = Helper.ipAddressRegex.hasMatch(ipAddressController.text);
+    bool portValid = Helper.portRegex.hasMatch(portController.text);
+    if (!ipAddressValid) {
+      Helper.showWarningSnackBar(context, "Ip address is invalid");
+    } else if (!portValid) {
+      Helper.showWarningSnackBar(context, "Port is invalid");
+    } else if (ipAddressController.text.isEmpty || portController.text.isEmpty) {
+      Helper.showWarningSnackBar(context, "Ip address or port is empty");
+    } else if (ipAddressValid && portValid) {
+      print("ip address: ${ApiConfig.ipAddress}, port: ${ApiConfig.port}");
+      Helper.showSuccessSnackBar(context, "Configurated successfully");
+      ApiConfig.setIpAddress(ipAddressController.text);
+      ApiConfig.setPort(portController.text);
+      ApiConfig.setBaseUrl();
+      print("base url: ${ApiConfig.baseUrl}");
+      restart();
+      Navigator.pop(context);
+    }
+  }
+
+  Widget textFieldSection({
+    required TextEditingController controller,
+    required String hintText,
+    required String labelText,
+    FocusNode? focusNode,
+    FocusNode? nextFocusNode,
+    bool autofocus = false,
+  }) {
+    return TextField(
+      controller: controller,
+      focusNode: focusNode,
+      autofocus: true,
+
+      textInputAction: nextFocusNode != null
+        ? TextInputAction.next
+        : TextInputAction.done,
+
+      onSubmitted: (_) {
+        if (nextFocusNode != null) {
+          FocusScope.of(context).requestFocus(nextFocusNode);
+        }
+      },
+
+      keyboardType: TextInputType.number,
+
+      decoration: InputDecoration(
+        hintText: hintText,
+        labelText: labelText,
+        labelStyle: TextStyle(color: Color(0xff7c7c7c)),
+
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey, width: 1),
+        ),
+
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.black, width: 2),
+        ),
+      ),
+      style: TextStyle(
+        color: Colors.black
       ),
     );
   }

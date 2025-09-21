@@ -1,9 +1,22 @@
 // --- Cấu hình API Base URL ---
 class ApiConfig {
-  //Bridge network
-  // static const String baseUrl = 'http://192.168.110.200:5000';  // wifi server host
-  // static const String baseUrl = 'http://192.168.253.104:5001';  // 5g server host
+  static String _ipAddress = "";
+  static String _port = "";
+  static String _baseUrl = 'http://';
 
-  //NAT network
-  static const String baseUrl = 'http://192.168.110.48:5001';
+  static String get baseUrl => _baseUrl;
+  static String get ipAddress => _ipAddress;
+  static String get port => _port;
+
+  static void setIpAddress(String ipAddress) {
+    _ipAddress = ipAddress;
+  }
+
+  static void setPort(String port) {
+    _port = port;
+  }
+
+  static void setBaseUrl() {
+    _baseUrl = 'http://$_ipAddress:$_port';
+  }
 }

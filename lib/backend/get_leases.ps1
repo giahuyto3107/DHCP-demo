@@ -8,7 +8,7 @@ if (-not $leases) {
     exit
 }
 
-$result = $leases | Select-Object @{
+$result = @($leases | Select-Object @{
     Name = 'IPAddress'; Expression = { $_.IPAddress.ToString() }
 }, @{
     Name = 'ScopeId'; Expression = { $_.ScopeId.ToString() }
@@ -19,7 +19,12 @@ $result = $leases | Select-Object @{
 }, @{
     Name = 'AddressState'; Expression = { $_.AddressState }
 }, @{
-    Name = 'LeaseExpiryTime'; Expression = { $_.LeaseExpiryTime.ToString("yyyy-MM-ddTHH:mm:ss") }
-}
+    Name = 'LeaseExpiryTime'; Expression = {
+        # Convert to milliseconds since Unix epoch (1970-01-01 00:00:00 UTC)
+        $epoch = [DateTime]::ParseExact("1970-01-01T00:00:00Z", "yyyy-MM-ddTHH:mm:ssZ", $null)
+        $milliseconds = [int64](($_.LeaseExpiryTime.ToUniversalTime() - $epoch).TotalMilliseconds)
+        "/Date($milliseconds)/"
+    }
+})
 
 $result | ConvertTo-Json -Depth 3

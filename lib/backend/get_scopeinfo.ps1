@@ -23,6 +23,20 @@ $networkCidr = $scope.SubnetAddress + "/$prefixLength"
 
 $poolRange = "$($scope.StartRange) - $($scope.EndRange)"
 
+# Function to convert IP to UInt32 (handles endianness)
+function IpToUInt32 {
+    param([System.Net.IPAddress]$ip)
+    $bytes = $ip.GetAddressBytes()
+    if ([BitConverter]::IsLittleEndian) {
+        [Array]::Reverse($bytes)
+    }
+    return [BitConverter]::ToUInt32($bytes, 0)
+}
+
+$startInt = IpToUInt32 $scope.StartRange
+$endInt = IpToUInt32 $scope.EndRange
+$poolSize = $endInt - $startInt + 1
+
 $result = [PSCustomObject]@{
     NetworkCidr = $networkCidr  # e.g., "192.168.2.0/24"
     Network     = $scope.SubnetAddress
@@ -32,7 +46,7 @@ $result = [PSCustomObject]@{
     PoolRange   = $poolRange    # e.g., "192.168.2.100 - 192.168.2.200"
     PoolStart   = $scope.StartRange
     PoolEnd     = $scope.EndRange
-    PoolSize    = ($scope.EndRange.Address - $scope.StartRange.Address + 1)
+    PoolSize    = $poolSize
     # NumberOfLeases added in Python
 }
 

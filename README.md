@@ -110,8 +110,25 @@ Double-check:
 
 Correct Scope ID is set in dhcp_api.py.
 
+
+
 API host IP address & port are set correctly in the Flutter app.
 
 The network adapter is set to Bridged Mode.
 
 The firewall is disabled (or properly configured to allow port 5001).
+
+
+# 📬 Contact Info
+
+If you encounter any issues or need assistance:
+
+
+
+
+
+File an Issue: Report problems or ask questions on the GitHub Issues page.
+
+
+
+Email Support: Reach out via Gmail at giahuyto3107@gmail.com.
